@@ -1,0 +1,143 @@
+package com.example.pikachu.outlab9;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.SimpleAdapter;
+
+import org.json.JSONArray;
+// import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class SearchActivity extends AppCompatActivity {
+
+    EditText searchkeyword;
+    ProgressBar progressBar;
+    // static final String API_KEY = "USE_YOUR_OWN_API_KEY";
+    static final String API_URL = "https://api.github.com/search/users?q=";
+
+    ArrayList<HashMap<String, String>> usersList;
+    ListView lv = (ListView) findViewById(R.id.list);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
+
+        searchkeyword = (EditText) findViewById(R.id.keyword);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        Button queryButton = (Button) findViewById(R.id.searchbutton);
+        queryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ExtractDataTask().execute();
+            }
+        });
+    }
+
+    class ExtractDataTask extends AsyncTask<Void, Void, String> {
+
+        private Exception exception;
+
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        protected String doInBackground(Void... urls) {
+            String searchkey = searchkeyword.getText().toString();
+            // Do some validation here
+
+            try {
+                URL url = new URL(API_URL + searchkey);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                String response;
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line).append("\n");
+                    }
+                    bufferedReader.close();
+
+                    response = stringBuilder.toString();
+
+                    /* usersList = new ArrayList<>();
+
+                    JSONObject responseObj = new JSONObject(response);
+
+                    // Getting JSON Array node
+                    JSONArray users = responseObj.getJSONArray("items");
+
+                    // looping through All Contacts
+                    for (int i = 0; i < users.length() && i < 30; i++) {
+                        JSONObject c = users.getJSONObject(i);
+
+                        String username = c.getString("login");
+
+                        // Phone node is JSON Object
+                        JSONObject phone = c.getJSONObject("phone");
+                        String mobile = phone.getString("mobile");
+                        String home = phone.getString("home");
+                        String office = phone.getString("office");
+
+                        // tmp hash map for single contact
+                        HashMap<String, String> user = new HashMap<>();
+
+                        // adding each child node to HashMap key => value
+                        user.put("login", username);
+
+                        // adding contact to contact list
+                        usersList.add(user); */
+                return response;
+            } finally {
+                    urlConnection.disconnect();
+                }
+            } catch (Exception e) {
+                Log.e("ERROR", e.getMessage(), e);
+                return null;
+            }
+        }
+
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.GONE);
+
+            
+
+            ListAdapter adapter = new SimpleAdapter(
+                    SearchActivity.this, usersList,
+                    R.layout.list_item, new String[]{"username"}, new int[]{R.id.name});
+
+            lv.setAdapter(adapter);
+            // responseView.setText(response);
+
+//            try {
+//                JSONObject object = (JSONObject) new JSONTokener(response).nextValue();
+//                String requestID = object.getString("requestId");
+//                int likelihood = object.getInt("likelihood");
+//                JSONArray photos = object.getJSONArray("photos");
+//                .
+//                .
+//                .
+//                .
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+        }
+    }
+}
