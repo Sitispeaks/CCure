@@ -1,0 +1,71 @@
+#!/bin/bash
+
+if [[ $1 == "server" && $2 == "set-url"  ]]; then
+    url=$3
+    printf "$url" > ~/server_url.txt
+
+elif [[ $1 == "config" && $2 == "edit" ]]; then
+	
+	echo -n "Username:" 
+	read user
+	
+	flag=1
+	
+	while [[ flag -eq "1" ]]; do
+		
+		echo -n "Password:"            #used -n to get argument in same line as echo 
+		stty -echo                     #used stty to hide password in terminal
+		read passwd
+		stty echo 
+		printf "\n"
+
+		
+		echo -n "Confirm Password:"
+		stty -echo 
+		read passwd_confirm
+		stty echo 
+		printf "\n"
+		
+		if [[ "$passwd" != "$passwd_confirm" ]]; then
+		    echo Password do not match
+	      	    echo Enter Password Again
+		
+		else 
+			flag=0;
+			printf "$user\n$passwd\n" > ~/info.txt		
+		fi
+	done
+
+
+elif [[ $1 == "version" ]]; then
+    echo 1.0
+
+elif [[ $1 == "server" ]]; then
+    
+    url=$(<~/server_url.txt)
+    details=$(echo $url | tr ":" "\n")
+    var1="IP Address"
+    for i in $details
+    do
+	echo "$var1 = $i"
+	var1="Port Number"
+    done
+    
+    #echo "IP Address = ${details[0]}";
+    #echo "Port Number = ${details[1]}" 
+
+elif [[ $1 == "help" ]]; then
+    
+    echo "usage: spc [arguments]"
+    echo 'arguments = version,config edit,server set-url "<server-url>"' 
+
+elif [[ $1 == "observe" ]]; then
+    dir_path=$2;
+    url=$(<~/server_url.txt)
+    var="python login.py $url $dir_path"
+    eval $var
+    
+else
+    echo 'Unrecognized Command'
+    echo 'Please type "spc help" or refer to man pages to know about valid commands and their uses'
+fi

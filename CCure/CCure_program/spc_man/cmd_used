@@ -1,0 +1,2 @@
+sudo cp ~/spc_man/spc /usr/local/man/man8/spc.8
+

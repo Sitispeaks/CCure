@@ -1,0 +1,14 @@
+.TH man 8 "22 October 2018" "1.0" "spc man page"
+.SH NAME
+spc \- secured persoanl cloud
+.SH VERSION
+Kal.Ki.Nirmal 
+.SH SYNOPSIS
+spc [OPTIONS] or 
+spc [OPTIONS] [OPTIONS]
+.SH DESCRIPTION
+SPC uploads file to server.sync,conifigure,edit,delete of files are some common features of it.
+
+
+.SH AUTHOR
+KKN

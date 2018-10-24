@@ -1,0 +1,3 @@
+cp ./spc /tmp
+sudo cp /tmp/spc /usr/bin
+
